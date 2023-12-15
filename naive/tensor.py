@@ -8,33 +8,8 @@ from tensorly.decomposition import parafac
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from xgboost.sklearn import XGBClassifier
-from utils import load_dataset
+from utils import load_dataset, average_f1_score
 import pandas as pd
-
-
-def compute_f1(labels, predicts, dim):
-    tp, fp, fn = 0, 0, 0
-    for ids in range(len(labels)):
-        label = labels[ids]
-        pred = predicts[ids]
-        if label == dim and pred == dim:
-            tp += 1
-        elif label != dim and pred == dim:
-            fp += 1
-        elif label == dim and pred != dim:
-            fn += 1
-    precision = tp / (tp + fp)
-    recall = tp / (tp + fn)
-    return 2 * precision * recall / (precision + recall)
-
-
-def average_compute_f1(labels, predicts):
-    return (
-        compute_f1(labels, predicts, 0)
-        + compute_f1(labels, predicts, 1)
-        + compute_f1(labels, predicts, 2)
-    ) / 3
-
 
 output = False
 
@@ -65,4 +40,4 @@ if output:
     y_test.to_csv("../data/submit.csv", index=False)
 else:
     print(accuracy_score(y_test, y_pred))
-    print(average_compute_f1(y_test, y_pred))
+    print(average_f1_score(y_test, y_pred))

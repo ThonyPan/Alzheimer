@@ -7,6 +7,29 @@ def load_dataset(path):
         data = hf["data"][:]
     return data
 
+def f1_score(labels, predicts, dim):
+    tp, fp, fn = 0, 0, 0
+    for ids in range(len(labels)):
+        label = labels[ids]
+        pred = predicts[ids]
+        if label == dim and pred == dim:
+            tp += 1
+        elif label != dim and pred == dim:
+            fp += 1
+        elif label == dim and pred != dim:
+            fn += 1
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    return 2 * precision * recall / (precision + recall)
+
+
+def average_f1_score(labels, predicts):
+    return (
+        f1_score(labels, predicts, 0)
+        + f1_score(labels, predicts, 1)
+        + f1_score(labels, predicts, 2)
+    ) / 3
+
 def visualize_data(data, path):
     assert data.shape.__len__() == 3
     if not os.path.exists(path):
