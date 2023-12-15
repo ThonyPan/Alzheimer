@@ -3,3 +3,4 @@
 **/__pycache__
 
 *.pth
+!resnet_10_23dataset.pth
