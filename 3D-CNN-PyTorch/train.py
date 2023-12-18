@@ -39,8 +39,8 @@ def main(args):
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
 
-    # model = generate_model(cnn_name=args.cnn_name, n_classes=args.n_classes, in_channels=args.in_channels)
-    model = DenseNet264(spatial_dims=3, in_channels=1, out_channels=3).to(device)
+    model = generate_model(cnn_name=args.cnn_name, n_classes=args.n_classes, in_channels=args.in_channels)
+    # model = DenseNet264(spatial_dims=3, in_channels=1, out_channels=3).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-5)
