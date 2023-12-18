@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import f1_score
 
 def calc_3class_f1(y_true, y_pred):
     # calculate f1 score for 3 class
@@ -28,12 +29,15 @@ golden = golden.astype(int)
 print("golden:", golden)
 print("test[0]:", test[0])
 print("f1score:", calc_3class_f1(golden, test))
+print("sklearn f1score:", f1_score(golden, test, average="macro"))
 test[0] = 0
 print("test[0]:", test[0])
 print("f1score:", calc_3class_f1(golden, test))
+print("sklearn f1score:", f1_score(golden, test, average="macro"))
 test[0] = 2
 print("test[0]:", test[0])
 print("f1score:", calc_3class_f1(golden, test))
+print("sklearn f1score:", f1_score(golden, test, average="macro"))
 
 # for k in range(1000):
 #     test_set = {0, 1, 2}
