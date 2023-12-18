@@ -18,7 +18,7 @@ def load_test():
     X_val_a = load_dataset("../data/testa.h5")
     X_val_b = load_dataset("../data/testb.h5")
     X_val = np.concatenate((X_val_a, X_val_b))
-    y_val = np.array(pd.read_csv("../data/submit.csv")["label"])
+    y_val = np.array(pd.read_csv("../data/test_label.csv")["label"])
 
     X_val = X_val[y_val != '不相关']
     y_val = y_val[y_val != '不相关'].astype(int)

@@ -41,4 +41,6 @@ if __name__ == '__main__':
                 result_df.loc[result_df.shape[0]] = [('testa_{}'.format(ii)),indexs]
             else:
                 result_df.loc[result_df.shape[0]] = [('testb_{}'.format(ii - len(X_testa))),indexs]
+
+
     result_df.to_csv('../data/submit.csv', index=False)

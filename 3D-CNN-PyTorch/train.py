@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from MyDataSet import MyDataset
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from utils import load_dataset, load_train, load_test
@@ -12,6 +13,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from generate_model import generate_model
+from monai.networks.nets import DenseNet264
 
 import argparse
 
@@ -23,19 +25,23 @@ def main(args):
     X_train, y_train = load_train()
     X_val, y_val = load_test()
     
-    # 转换为PyTorch张量并移动到GPU（如果可用）
-    X_train_tensor = torch.tensor(X_train).float().to(device)
-    y_train_tensor = torch.tensor(y_train).long().to(device)  # 长整型适用于分类问题的标签
-    X_val_tensor = torch.tensor(X_val).float().to(device)
-    y_val_tensor = torch.tensor(y_val).long().to(device)
+    # # 转换为PyTorch张量并移动到GPU（如果可用）
+    # X_train_tensor = torch.tensor(X_train).float()
+    # y_train_tensor = torch.tensor(y_train).long()  # 长整型适用于分类问题的标签
+    # X_val_tensor = torch.tensor(X_val).float()
+    # y_val_tensor = torch.tensor(y_val).long()
 
     # 创建数据加载器
-    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-    val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
+    train_dataset = MyDataset(datas=X_train, labels=y_train, phase='train')
+    val_dataset = MyDataset(datas=X_val, labels=y_val, phase='train')
+    # train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+    # val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
 
-    model = generate_model(cnn_name=args.cnn_name, n_classes=args.n_classes, in_channels=args.in_channels)
+    # model = generate_model(cnn_name=args.cnn_name, n_classes=args.n_classes, in_channels=args.in_channels)
+    model = DenseNet264(spatial_dims=3, in_channels=1, out_channels=3).to(device)
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
@@ -51,6 +57,7 @@ def main(args):
         y_train_true = []
         y_train_pred = []
         for data, target in train_loader:
+            data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
@@ -72,7 +79,8 @@ def main(args):
         y_val_true = []
         y_val_pred = []
         with torch.no_grad():
-            for data, target in val_loader:          
+            for data, target in val_loader:     
+                data, target = data.to(device), target.to(device)     
                 output = model(data)
                 val_loss += criterion(output, target).item()
                 _, val_predicted = torch.max(output.data, 1)
@@ -97,7 +105,8 @@ def main(args):
             'Val Accuracy:{:.3f}...'.format(val_acc),
             'Val F1 Score:{:.3f}'.format(val_f1_score))
         if val_f1_score > min_val_f1_score:
-            torch.save(model, os.path.join(args.model_weights_path, args.cnn_name + '.pth'))
+            torch.save(model, os.path.join(args.model_weights_path, args.cnn_name + '_2' + '.pth'))
+            print('Save model at path: {}'.format(os.path.join(args.model_weights_path, args.cnn_name + '_2' + '.pth')))
             epochs_no_improve = 0
             min_val_f1_score = val_f1_score
         else:
