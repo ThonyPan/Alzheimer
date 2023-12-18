@@ -97,7 +97,7 @@ def main(args):
             'Val Accuracy:{:.3f}...'.format(val_acc),
             'Val F1 Score:{:.3f}'.format(val_f1_score))
         if val_f1_score > min_val_f1_score:
-            torch.save(model, 'densenet.pth')
+            torch.save(model, os.path.join(args.model_weights_path, args.cnn_name + '.pth'))
             epochs_no_improve = 0
             min_val_f1_score = val_f1_score
         else:
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     args.add_argument("--cnn_name", type=str, default="cnn")
     args.add_argument("--n_classes", type=int, default=3)
     args.add_argument("--in_channels", type=int, default=1)
+    args.add_argument("--model_weights_path", type=str, default="weights")
 
     args = args.parse_args()
     main(args)
