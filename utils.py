@@ -1,11 +1,29 @@
 import h5py
 import imageio
 import os
+import numpy as np
+import pandas as pd
 
 def load_dataset(path):
     with h5py.File(path, "r") as hf:
         data = hf["data"][:]
     return data
+
+def load_train():
+    X_train = load_dataset("../data/train_pre_data.h5")
+    y_train = np.array(pd.read_csv("../data/train_pre_label.csv")["label"])
+    return X_train, y_train
+
+def load_test():
+    X_val_a = load_dataset("../data/testa.h5")
+    X_val_b = load_dataset("../data/testb.h5")
+    X_val = np.concatenate((X_val_a, X_val_b))
+    y_val = np.array(pd.read_csv("../data/submit.csv")["label"])
+
+    X_val = X_val[y_val != '不相关']
+    y_val = y_val[y_val != '不相关'].astype(int)
+
+    return X_val, y_val
 
 def f1_score(labels, predicts, dim):
     tp, fp, fn = 0, 0, 0

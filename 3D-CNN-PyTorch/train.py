@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
-from utils import load_dataset
+from utils import load_dataset, load_train, load_test
 from sklearn.metrics import f1_score
 import numpy as np
 import pandas as pd
@@ -20,13 +20,9 @@ def main(args):
     # 检查CUDA是否可用，并设置device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 假定X_train和y_train已经被定义并且格式正确
-    X_train = load_dataset("../data/train_pre_data.h5")
-    y_train = np.array(pd.read_csv("../data/train_pre_label.csv")["label"])
-
-    # 划分训练集和验证集
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
-
+    X_train, y_train = load_train()
+    X_val, y_val = load_test()
+    
     # 转换为PyTorch张量并移动到GPU（如果可用）
     X_train_tensor = torch.tensor(X_train).float().to(device)
     y_train_tensor = torch.tensor(y_train).long().to(device)  # 长整型适用于分类问题的标签
