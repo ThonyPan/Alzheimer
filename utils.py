@@ -40,3 +40,12 @@ def visualize_data(data, path):
 
     for i in range(data.shape[0]):
         imageio.imwrite(f"{path}/image_{i}.png", data[i])
+
+def export_ex2_data(data, path):
+    import pyvista
+    assert data.shape.__len__() == 3
+    grid = pyvista.UniformGrid()
+    grid.dimensions = data.shape
+    grid.point_data["values"] = data.flatten(order='F')  
+
+    grid.save(path)
